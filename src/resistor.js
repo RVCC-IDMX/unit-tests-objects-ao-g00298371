@@ -122,9 +122,14 @@ function getMultiplierValue(color) {
  *
  */
 function getThreeBandValue(bands) {
-  let prod = bands.color1 * 10 + bands.color2;
-  prod *= bands.multiplier;
-  return prod;
+  const value = +`${getColorValue(bands.color1)}${getColorValue(bands.color2)}` * getMultiplierValue(bands.multiplier);
+  let formattedValue = value;
+  if (bands.multiplier === 'gold') {
+    formattedValue = +value.toFixed(1);
+  } else if (bands.multiplier === 'silver') {
+    formattedValue = +value.toFixed(2);
+  }
+  return formattedValue;
 }
 
 /**
@@ -148,24 +153,22 @@ function getThreeBandValue(bands) {
  * either const or let
  *
  */
-function abbreviateNumber(value) {
-  let newValue = value;
-  if (value >= 1000) {
-    const suffixes = ['', 'k', 'M', 'G'];
-    const suffixNum = Math.floor((`${value}`).length / 3);
-    let shortValue = '';
-    for (let precision = 2; precision >= 1; precision--) {
-      shortValue = parseFloat((suffixNum != 0 ? (value / 1000 ** suffixNum) : value).toPrecision(precision));
-      const dotLessShortValue = (`${shortValue}`).replace(/[^a-zA-Z 0-9]+/g, '');
-      if (dotLessShortValue.length <= 2) { break; }
-    }
-    if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
-    newValue = shortValue + suffixes[suffixNum];
-  }
-  return newValue;
-}
 function formatNumber(val) {
-  return abbreviateNumber(val);
+  let value = val;
+  let metric = '';
+  if (value >= 1000000000) {
+    value /= 1000000000;
+    metric = 'G';
+  }
+  if (value >= 1000000) {
+    value /= 1000000;
+    metric = 'M';
+  }
+  if (value >= 1000) {
+    value /= 1000;
+    metric = 'k';
+  }
+  return value + metric;
 }
 
 /**
@@ -184,7 +187,17 @@ function formatNumber(val) {
  * example: 'green' => '±0.5%'
  */
 function getTolerance(color) {
-  // write your code here & return value
+  const toleranceCodes = {
+    brown: '±1%',
+    red: '±2%',
+    green: '±0.5%',
+    blue: '±0.25%',
+    violet: '±0.1%',
+    grey: '±0.05%',
+    gold: '±5%',
+    silver: '±10%',
+  };
+  return toleranceCodes[color];
 }
 
 /**
@@ -216,7 +229,10 @@ function getTolerance(color) {
  * must use functions in this file to build the string using a template literal
  */
 function getResistorOhms(bands) {
-  // write your code here & return value
+  const value = getThreeBandValue(bands);
+  const formattedValue = formatNumber(value);
+  const tolerance = getTolerance(bands.tolerance);
+  return `Resistor value: ${formattedValue} Ohms ${tolerance}`;
 }
 
 module.exports = {
