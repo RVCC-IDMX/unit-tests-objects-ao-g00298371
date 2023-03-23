@@ -1,3 +1,6 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable eqeqeq */
+/* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 /* resistor.js */
 
@@ -32,22 +35,35 @@
 
     Here's a Lookup Table for the Multipliers. Each color represents a the multiplication factor
     that is used with the value from the first 2 bands.
-
-    const multiplierCodes = {
-     black:          1,
-     brown:         10,
-     red:          100,
-     orange:      1000,
-     yellow:     10000,
-     green:     100000,
-     blue:     1000000,
-     violet:  10000000,
-     grey:   100000000,
-     white: 1000000000,
-     gold: 0.1,
-     silver: 0.01
-  };
  */
+
+const colorCodes = {
+  black: 0,
+  brown: 1,
+  red: 2,
+  orange: 3,
+  yellow: 4,
+  green: 5,
+  blue: 6,
+  violet: 7,
+  grey: 8,
+  white: 9,
+};
+
+const multiplierCodes = {
+  black: 1,
+  brown: 10,
+  red: 100,
+  orange: 1000,
+  yellow: 10000,
+  green: 100000,
+  blue: 1000000,
+  violet: 10000000,
+  grey: 100000000,
+  white: 1000000000,
+  gold: 0.1,
+  silver: 0.01,
+};
 
 /**
  * Returns the digit as a number from the resistor color code
@@ -62,7 +78,7 @@
  * then use the copied object like a lookup table
  */
 function getColorValue(color) {
-  // write your code here & return value
+  return colorCodes[color];
 }
 
 /**
@@ -79,7 +95,7 @@ function getColorValue(color) {
  * then use the copied object like a lookup table
  */
 function getMultiplierValue(color) {
-  // write your code here & return value
+  return multiplierCodes[color];
 }
 
 /**
@@ -106,7 +122,9 @@ function getMultiplierValue(color) {
  *
  */
 function getThreeBandValue(bands) {
-  // write your code here & return value
+  let prod = bands.color1 * 10 + bands.color2;
+  prod *= bands.multiplier;
+  return prod;
 }
 
 /**
@@ -130,8 +148,24 @@ function getThreeBandValue(bands) {
  * either const or let
  *
  */
+function abbreviateNumber(value) {
+  let newValue = value;
+  if (value >= 1000) {
+    const suffixes = ['', 'k', 'M', 'G'];
+    const suffixNum = Math.floor((`${value}`).length / 3);
+    let shortValue = '';
+    for (let precision = 2; precision >= 1; precision--) {
+      shortValue = parseFloat((suffixNum != 0 ? (value / 1000 ** suffixNum) : value).toPrecision(precision));
+      const dotLessShortValue = (`${shortValue}`).replace(/[^a-zA-Z 0-9]+/g, '');
+      if (dotLessShortValue.length <= 2) { break; }
+    }
+    if (shortValue % 1 != 0) shortValue = shortValue.toFixed(1);
+    newValue = shortValue + suffixes[suffixNum];
+  }
+  return newValue;
+}
 function formatNumber(val) {
-  // write your code here & return value
+  return abbreviateNumber(val);
 }
 
 /**
